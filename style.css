@@ -1,0 +1,79 @@
+.header {
+    border-bottom: 5px solid palevioletred;
+    border-left: pink;
+    border-right: 3px solid pink;
+    padding: 2em
+    
+}
+.body{
+    background-color: #9932cc;
+}
+
+
+.headerTitle {
+    padding: 10px 10px;
+}
+
+.incrementBtn,
+.decrementBtn {
+    border-radius: 90%;
+    margin-bottom: 20px;
+}
+
+.pizza {
+    padding: 20px;
+    border: 4px solid teal;
+    border-radius: 8px;
+    background-color: thistle;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 1.1);
+    max-width: 615px;
+    margin: 0 auto;
+    font-size: 16px;
+    color: #333;
+    transition: 0.3s ease-in-out;
+}
+
+.pizza:hover{
+    transform: scale(1.2); 
+}
+
+.card-image {
+    background-size: contain;
+    background-position: center;
+    position: relative;
+}
+
+.card-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: whitesmoke;
+    z-index: 1;
+}
+
+.card-image img,
+.card-image a {
+    position: relative;
+    z-index: 2;
+}
+ 
+@media (min-width: 760px) { 
+    /*apply this CSS if the page is wider than 760px*/
+    body {
+        background-color: #4e0837;
+    }
+}
+
+@media (min-width: 960px) {
+    /*apply this CSS if the page is wider than 760px*/
+    body {
+        background-color: #9932cc;
+    }
+
+        .pizzas {
+            display: flex;
+        }
+    }

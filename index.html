@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+   
+   
+
+    <link rel="stylesheet" href="style.css">
+    <script src="index.js"></script>
+    <title>Pizza Cart Apline</title>
+</head>
+
+<body class="bg-blue-400">
+    <div x-data="{title: 'Perfect Pizza'}" class="container">
+        <div class="header text-center font-bold size justify-center mt-10 mb-10">
+            <h1 x-text="title" class="text-4xl pb-3"></h1>
+                <h1>Pizza Orders</h1>
+        </div>
+    </div>
+
+    <div x-data="ShoppingCart()" @add-to-cart.window="addToCart($event.detail.size)"
+        @add-to-cart_small.window="incrementPrice($event.detail.size)"
+        @add-to-cart-medium.window="incrementPriceMedium($event.detail.size)"
+        @add-to-cart-large.window="incrementPriceLarger($event.detail.size)" class="container bg-pink-300">
+        <div x-data="{header: 'Shopping Cart'}">
+            <h1 x-text="header" class="text-center font-bold text-2xl headerTitle mb-10"></h1>
+        </div>
+
+        <div class="row">
+            <div class="col-s3-l3">
+                <div class="flex justify-center">
+                    <div class="mx-4 my-1">
+                        <span x-text="cart.Small" class="font-semibold"></span>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="addToCart('smallpricePizza'); incrementPrice('smallPizza')"
+                            class="bg-gray-400 font-semibold text-white px-4 py-2 incrementBtn hover:bg-gray-600 transition duration-200">
+                            +
+                        </button>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="removeFromCart('smallpricePizza'); decrementPrice('smallPizza')"
+                            class="bg-gray-400 text-white px-4 py-2 font-semibold decrementBtn hover:bg-gray-600 transition duration-200">
+                            -
+                        </button>
+                    </div>
+
+                    <div class="mx-4 my-1">
+                        <span x-text="emptyCart.smallpricePizza" class="font-semibold"></span>
+                        <span x-text="ZeroItemsOncart.smallPizza" class="font-semibold mx-5">R</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-s3-l3">
+                <div class="flex justify-center">
+                    <div class="mx-4 my-1">
+                        <span x-text="cart.Medium" class="font-semibold"></span>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="addToCart('medipricePizza'); incrementPriceMedium('mediumPizza')"
+                            class="bg-gray-400 font-semibold text-white px-4 py-2 incrementBtn hover:bg-gray-600 transition duration-200">
+                            +
+                        </button>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="removeFromCart('medipricePizza'); decrementPriceMedium('mediumPizza')"
+                            class="bg-gray-400 text-white px-4 py-2 font-semibold decrementBtn hover:bg-gray-600 transition duration-200">
+                            -
+                        </button>
+                    </div>
+
+                    <div class="mx-4 my-1">
+                        <span x-text="emptyCart.medipricePizza" class="font-semibold"></span>
+                        <span x-text="ZeroItemsOncart.mediumPizza" class="font-semibold mx-5">R</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-s3-l3">
+                <div class="flex justify-center">
+                    <div class="mx-4 my-1">
+                        <span x-text="cart.Large" class="font-semibold"></span>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="addToCart('largepricePizza'); incrementPriceLarger('largePizza')"
+                            class="bg-gray-400 font-semibold text-white px-4 py-2 incrementBtn hover:bg-gray-600 transition duration-200">
+                            +
+                        </button>
+                    </div>
+
+                    <div class="mx-2">
+                        <button x-on:click="removeFromCart('largepricePizza'); decrementPriceLarge('largePizza')"
+                            class="bg-gray-400 text-white px-4 py-2 font-semibold decrementBtn hover:bg-gray-600 transition duration-200">
+                            -
+                        </button>
+                    </div>
+
+                    <div class="mx-4 my-1">
+                        <span x-text="emptyCart.largepricePizza" class="font-semibold"></span>
+                        <span x-text="ZeroItemsOncart.largePizza" class="font-semibold mx-5">R</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-s3-l6">
+                <div class="flex justify-center mx-5 space-x-6">
+                    <p class="font-semibold mt-8">Total cost: R<span x-text="totalCost.toFixed(2)"></span></p>
+                </div>
+            </div>
+
+            <div class="flex justify-center py-10">
+                <button @click="proceedToCheckout" x-show="hasItems && !isCheckingOut"
+                    class="bg-gray-400 mb-3 font-bold text-1xl px-20 py-2 rounded hover:bg-gray-500 text-white transition duration-200">
+                    Check Out
+                </button>
+
+                <div x-show="isCheckingOut" class="bg-gray-100 p-6 rounded-lg shadow-md">
+                    <div class="mb-4">
+                        <label for="paymentAmount" class="block text-gray-700 font-semibold mb-2">Enter Payment
+                            Amount</label>
+                        <input type="number" id="paymentAmount" x-model.number="paymentAmount"
+                            @input="paymentAmount = paymentAmount < 0 ? 0 : paymentAmount" placeholder="Enter amount"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button @click="checkout"
+                        class="w-full bg-purple-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-200">Pay</button>
+                </div>
+            </div>
+
+            <div x-show="message"
+                class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-transform"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="translate-y-full opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="translate-y-0 opacity-100"
+                x-transition:leave-end="translate-y-full opacity-0">
+                <p x-text="message"></p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div x-data="{
+            smallSize: 'Small Pizza',
+            smallPrice: 'R31.99',
+            smallFav: `A traditional tomato base topped with mozzarella cheese, avocado, bacon, and Italian spices. A flat base of leavened wheat-based dough topped with tomato, cheese, and other ingredients.
+            .`,
+
+            mediumPizza: 'Medium Pizza',
+            mediumPrice: 'R58.99',
+            mediumFav: `Enjoy a variety of our delicious Italian inspired pizzas. From our meatiest pizza to our Margherita pizza, whatever you prefer, we have it.`,
+
+            largePizza: 'Large Pizza',
+            largePrice: 'R87.99',
+            largeFav: `Our famous Margherita covered in thinly sliced pepperoni and the toppings of your choice. Marinara Sauce, Mozzarella Cheese, Rib Meat.`
+        }" class="container bg-blue-200">
+        <div x-data="ShoppingCart()" class="row">
+            <div class="col s12 l4">
+                <div class="card">
+                    <div class="card-image p-10" style="display: grid; place-items: center;">
+                        <img src="pizza.jpeg" alt="small pizza" style="width: 100px" class="flex justify-center">
+
+                    </div>
+
+                    <div class="card-content">
+                        <div class="pizza">
+                            <div class="mb-2">
+                                <span x-text="smallSize" class="text-3xl font-semibold"></span>
+                            </div>
+
+                            <div x-text="smallPrice" class="text-xl font-bold pb-2"></div>
+                            <p x-html="smallFav" class="bg-purple-200 p-4 my-6 rounded font-semibold"></p>
+                        </div>
+                    </div>
+
+                    <div class="card-action">
+                        <div class="SmallBuyBtn flex justify-center">
+                            <button x-on:click="$dispatch('add-to-cart', { size: 'smallpricePizza' }); 
+                                                $dispatch('add-to-cart_small', { size: 'smallPizza' })"
+                                class="bg-pink-500 mt-2 mb-3 font-bold text-1xl px-20 py-2 rounded hover:bg-red-600 text-black transition duration-200">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 l4">
+                <div class="card">
+                    <div class="card-image p-10" style="display: grid; place-items: center;">
+                        <img src="pizza.jpeg" alt="small pizza" style="width: 120px">
+                    </div>
+
+                    <div class="card-content">
+                        <div class="pizza">
+                            <div class="mb-2">
+                                <span x-text="mediumPizza" class="text-3xl font-semibold"></span>
+                            </div>
+
+                            <div x-text="mediumPrice" class="text-xl font-bold pb-2"></div>
+                            <p x-html="mediumFav" class="bg-gray-200 p-4 my-6 rounded font-semibold"></p>
+                        </div>
+                    </div>
+
+                    <div class="card-action">
+                        <div class="MediumBuyBtn flex justify-center">
+                            <button x-on:click="$dispatch('add-to-cart', { size: 'medipricePizza' });
+                                                $dispatch('add-to-cart-medium', { size: 'mediumPizza' })"
+                                class="bg-pink-400 mt-2 mb-3 font-bold text-1xl px-20 py-2 rounded hover:bg-red-600 text-blue transition duration-200">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 l4">
+                <div class="card">
+                    <div class="card-image p-10" style="display: grid; place-items: center;">
+                        <img src="pizza.jpeg" alt="small pizza" style="width: 130px">
+                    </div>
+
+                    <div class="card-content">
+                        <div class="pizza">
+                            <div class="mb-2">
+                                <span x-text="largePizza" class="text-3xl font-semibold"></span>
+                            </div>
+
+                            <div x-text="largePrice" class="text-xl font-bold pb-2"></div>
+                            <p x-html="largeFav" class="bg-gray-200 p-4 my-6 rounded font-semibold"></p>
+                        </div>
+                    </div>
+
+                    <div class="card-action">
+                        <div class="LargeBuyBtn flex justify-center">
+                            <button x-on:click="$dispatch('add-to-cart', { size: 'largepricePizza' })
+                                                $dispatch('add-to-cart-large', { size: 'largePizza' })"
+                                class="bg-pink-500 mt-2 mb-3 font-bold text-1xl px-20 py-2 rounded hover:bg-red-600 text-black transition duration-200">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-data="{
+            'contact':'Contact us at: (011)-221-1055 twitter',
+            'Logo': '@perfectpizza',
+
+            
+        }" class="container">
+        <footer x-data class="text-center mt-10 bg-pink-300 ">
+            <div class="pt-5 pb-5">
+                <p class="text-2xl font-semibold">@Kopano Inc | All Rights Reserved &copy; <span
+                        x-text="new Date().getFullYear()"></span></p>
+            </div>
+
+            <div class="pizza contact_us">
+                <h2>Contact details</h2>
+
+                Contact us at: 011 340 2001 info@perfectpizza.co.za
+            </div>
+        </div>
+
+    </div>
+    </footer>
+    </div>
+</body>
+</head>
+</html>
